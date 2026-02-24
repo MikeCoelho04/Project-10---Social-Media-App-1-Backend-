@@ -1,10 +1,17 @@
 const User = require('../models/user.models')
+const dotenv = require('dotenv')
 
 const fetchUsers = async (req, res) => {
 
   try {
 
     const users = await User.find()
+
+    users.map(user => {
+
+      user.avatarUrl = process.env.BASE_URL + user.avatarUrl 
+
+    })
 
     res.json({
       status: 'OK',
@@ -26,14 +33,14 @@ const createUser = async (req, res) => {
 
   try {
 
-    const { username, email, fullName, bio, avatar } = req.body
+    const { email, username, fullName, bio } = req.body
 
     await User.create({
-      username,
       email,
+      username,
       fullName,
       bio,
-      avatar,
+      avatarUrl: `uploads/profilePics/${req.file.filename}`,
     })
 
     res.json({
@@ -56,9 +63,11 @@ const updateUser = async (req, res) => {
 
   try {
 
+    console.log('teste')
+
     const { id } = req.params
     const { fullName, bio } = req.body
-    await User.findByIdAndUpdate(id, { fullName, bio })
+    await User.findByIdAndUpdate(id, { fullName, bio, avatarUrl: `uploads/profilePics/${req.file.filename}`})
 
     res.json({
       status: 'OK',

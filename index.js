@@ -5,14 +5,18 @@ const { urlencoded } = require('body-parser')
 dotenv.config()
 
 const userRoutes = require('./src/routes/user.routes')
+const postRoutes = require('./src/routes/post.routes')
+const commentRoutes = require('./src/routes/comment.routes')
 
 const app = express()
 
 app.use(express.urlencoded({extended: false}))
 
-app.use(express.static('uploads'))
+app.use('/uploads', express.static('uploads'))
 
 app.use('', userRoutes)
+app.use('', postRoutes)
+app.use('', commentRoutes)
 
 app.get('/', (req, res) => {
   res.json({
@@ -30,4 +34,5 @@ mongoose.connect(process.env.MONGODB_URL)
       console.log('Server is UP')
     })
   })
-  .catch((error) => {console.log('Falied to connect to the server', error)})
+  .catch((error) => {console.log('Falied to connect to the server', error)}
+)

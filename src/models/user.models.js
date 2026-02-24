@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
 
 const userSchema = mongoose.Schema({
-  username: {
+  email: {
     type: String,
     required: true,
     unique: true,
   },
-  email: {
+  username: {
     type: String,
     required: true,
     unique: true,
@@ -17,11 +17,22 @@ const userSchema = mongoose.Schema({
   },
   bio: {
     type: String,
-    minLength: 20,
   },
-  profilePic: {
+  avatarUrl: {
     type: String,
-  },  
+  },
+  followers: {
+    type: String,
+    default: '0',
+  },
+  following: {
+    type: String,
+    default: '0',
+  },
+  numberOfPosts: {
+    type: String,
+    default: '0',
+  },
 }, {
   timestamps: true,
 })
