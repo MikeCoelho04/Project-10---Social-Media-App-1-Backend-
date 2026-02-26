@@ -3,7 +3,7 @@ const User = require('./user.models')
 
 const postSchema = mongoose.Schema({
 
-  autor: {
+  author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: User,
     required: true,
@@ -11,11 +11,18 @@ const postSchema = mongoose.Schema({
   content: {
     type: String,
     required: true,
-    minLength: 50,
+    minLength: 1,
   },
-  likes: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: User,
+  mediaUrls: {
+    type: String,
+  },
+  likesCount: {
+    type: Number,
+    default: 0,
+  },
+  commentCount: {
+    type: Number,
+    default: 0,
   }
 
 }, {

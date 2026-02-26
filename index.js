@@ -7,6 +7,8 @@ dotenv.config()
 const userRoutes = require('./src/routes/user.routes')
 const postRoutes = require('./src/routes/post.routes')
 const commentRoutes = require('./src/routes/comment.routes')
+const likeRoutes = require('./src/routes/like.routes')
+const followRoutes = require('./src/routes/follow.routes')
 
 const app = express()
 
@@ -17,6 +19,8 @@ app.use('/uploads', express.static('uploads'))
 app.use('', userRoutes)
 app.use('', postRoutes)
 app.use('', commentRoutes)
+app.use('', likeRoutes)
+app.use('', followRoutes)
 
 app.get('/', (req, res) => {
   res.json({

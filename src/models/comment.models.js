@@ -4,20 +4,19 @@ const Post = require('./post.models')
 
 const commentSchema = mongoose.Schema({
 
-  post: {
+  postId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: Post,
-    required: true
+    required: true,
   },
-  author: {
+  authorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: User,
     required: true,
   },
-  comment: {
+  text: {
     type: String,
     required: true,
-    minLength: 1,
   }
 
 }, {

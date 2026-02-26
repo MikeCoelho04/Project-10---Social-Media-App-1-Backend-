@@ -22,16 +22,16 @@ const userSchema = mongoose.Schema({
     type: String,
   },
   followers: {
-    type: String,
-    default: '0',
+    type: Number,
+    default: 0,
   },
   following: {
-    type: String,
-    default: '0',
+    type: Number,
+    default: 0,
   },
   numberOfPosts: {
-    type: String,
-    default: '0',
+    type: Number,
+    default: 0,
   },
 }, {
   timestamps: true,

@@ -2,18 +2,21 @@ const express = require('express')
 const router = express.Router()
 
 const {
-  fetchComments,
   createComment,
+  fetchPostComments,
+  fetchComment,
   updateComment,
   deleteComment
 } = require('../controllers/comment.controllers')
 
-router.get('/comments', fetchComments)
+router.post('/posts/:postId/comments', createComment)
 
-router.post('/comments', createComment)
+router.get('/posts/:postId/comments', fetchPostComments)
 
-router.patch('/comments/:id', updateComment)
+router.get('/comments/:commentId', fetchComment)
 
-router.delete('/comments/:id', deleteComment)
+router.patch('/comments/:commentId', updateComment)
+
+router.delete('/comments/:commentId', deleteComment)
 
 module.exports = router

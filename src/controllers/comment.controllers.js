@@ -2,13 +2,67 @@ const Comment = require('../models/comment.models')
 const Post = require('../models/post.models')
 const User = require('../models/user.models')
 
-const fetchComments = async (req, res) => {
+const createComment = async (req, res) => {
 
   try {
 
-    const { post } = req.query
+    const { postId } = req.params
 
-    const postComment = await Comment.find({ post }).populate('author', 'username fullName').populate('post', 'content')
+    const { authorId, text } = req.body
+
+    const user = await User.findById(authorId)
+
+    if(!user) {
+      return res.status(400).json ({
+        status: 'FAILED',
+        message: 'Author not found'
+      })
+    }
+
+    const postToComment = await Post.findById(postId)
+
+    if(!postToComment) {
+      return res.status(400).json ({
+        status: 'FAILED',
+        message: 'Post not found'
+      })
+    }
+     
+    await Comment.create ({
+      postId,
+      authorId,
+      text,
+    })
+
+    await Post.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } })
+
+    res.json({
+      status: 'OK',
+      message: 'Comment created successfully!'
+    })
+
+  } catch(error) {
+
+    console.log(error)
+
+    res.status(500).json ({
+      status: 'FAILED',
+      message: 'Something went wrong'
+    })
+
+  }
+
+} 
+
+const fetchPostComments = async (req, res) => {
+
+  try {
+
+    const { postId } = req.params
+
+    const postComment = await Comment.find({ postId })
+    
+    //.populate('author', 'username fullName').populate('post', 'content')
 
     res.json({
       status: 'OK',
@@ -26,38 +80,19 @@ const fetchComments = async (req, res) => {
 
 }
 
-const createComment = async (req, res) => {
+const fetchComment = async (req, res) => {
 
   try {
 
-    const { post, author, content } = req.body
+    const { commentId } = req.params
 
-    const user = await User.findByid(author)
-    if(!user) {
-      return res.status(400).json ({
-        status: 'FAILED',
-        message: 'Author not found'
-      })
-    }
-
-    const postToComment = await Post.findById(post)
-    if(!postToComment) {
-      return res.status(400).json ({
-        status: 'FAILED',
-        message: 'Post not found'
-      })
-    }
-     
-
-    await Comment.create ({
-      post,
-      author,
-      content,
-    })
+    const comment = await Comment.findById(commentId)
+    
+    //.populate('author', 'username fullName').populate('post', 'content')
 
     res.json({
       status: 'OK',
-      message: 'Comment created successfully!'
+      data: comment
     })
 
   } catch(error) {
@@ -69,15 +104,16 @@ const createComment = async (req, res) => {
 
   }
 
-} 
+}
 
 const updateComment = async (req, res) => {
 
   try {
 
-    const { id } = req.params
-    const { content } = req.body
-    await Comment.findByIdAndUpdate(id, { content })
+    const { commentId } = req.params
+    const { text } = req.body
+
+    await Comment.findByIdAndUpdate(commentId, { text })
 
     res.json({
       status: 'OK',
@@ -85,6 +121,8 @@ const updateComment = async (req, res) => {
     })
 
   } catch(error) {
+
+    console.log(error)
 
     res.status(500).json ({
       status: 'FAILED',
@@ -99,14 +137,31 @@ const deleteComment = async (req, res) => {
 
   try {
 
-    const { id } = req.params
-    await Comment.findByIdAndDelte(id)
+    const { commentId } = req.params
+    
+    const comment = await Comment.findById(commentId)
+
+    if(!comment) {
+
+      return res.status(500).json({
+        status: 'FAILED',
+        message: 'Comment not found'
+      })
+
+    }
+
+    await Comment.findByIdAndDelete(commentId)
+
+
+
     res.json({
       status: 'OK',
       message: 'Comment deleted successfully!'
     })
  
   } catch(error) {
+
+    console.log(error)
 
     res.status(500).json ({
       status: 'FAILED',
@@ -118,8 +173,9 @@ const deleteComment = async (req, res) => {
 }
 
 module.exports = {
-  fetchComments,
   createComment,
+  fetchPostComments,
+  fetchComment,
   updateComment,
   deleteComment,
 }

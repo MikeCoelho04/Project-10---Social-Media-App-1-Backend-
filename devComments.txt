@@ -1,0 +1,25 @@
+O user tem o sguinte schema:
+
+email, username, fullName, bio, avatarUrl, followers, following, numberOfPosts
+
+The one's the user can update are: username, fullName, bio, avatarUrl.
+
+When updating the username the systems guarantees that it is not being used by another user.
+And when updating the avatarUrl, it will automatically update it's name:
+The name of the file is "username-date-of-creation-ext", so if the user updates the username and the profile pic all of the avatarUrl will change, if he onlys changes the profile pic only the date statment wiil change.
+
+When creating a user the following camps can't be introduced: followes, following and numberOfPosts. This camps can't also be updated.
+
+Image name process expalnation:
+
+So when uplaoding a picture the systems creates an random name by a middleware, only when it achives it's controller it will update the name with the correct data, this needs to be this way because of the methodm PATCH (UPDATE) as so we can only access req.body after mutler is finished  
+
+Every error is documentaded so it is easier for the user to understand what he did wrong, wheter he is using a already existing user, or duplciated email...
+
+So let's talk about posts,
+
+One very import part of the post model is the media whcih is designed by mediaUrls. So the default name for the media is "post-POSTID-DATE-EXTENSION" but has we are creating the post we don't have access to the post Id, as it hasn't been create yet, so in the middleware we again give a default name and only on the controller we give the true name. To do that we had to firstly create the post wihtout the media (only author and content fields) and only after that we could access the postId to name the image. We add the new file to the camp mediaUrls and then save.
+
+
+
+every request gives any type of details: it can be data, or messages: error messages, or display messages, so the user can be always informed of whats going on.

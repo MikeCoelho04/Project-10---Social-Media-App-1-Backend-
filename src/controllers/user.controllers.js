@@ -1,5 +1,7 @@
 const User = require('../models/user.models')
 const dotenv = require('dotenv')
+const path = require('path')
+const fs = require('fs/promises')
 
 const fetchUsers = async (req, res) => {
 
@@ -35,12 +37,23 @@ const createUser = async (req, res) => {
 
     const { email, username, fullName, bio } = req.body
 
+    // To change to the correct file name (avatarUrl)
+
+    const ext = path.extname(req.file.originalname)
+
+    const newFileName = `${username}-${Date.now()}${ext}`
+
+    const oldPath = req.file.path
+    const newPath = path.join(path.dirname(oldPath), newFileName)
+
+    await fs.rename(oldPath, newPath)
+
     await User.create({
       email,
       username,
       fullName,
       bio,
-      avatarUrl: `uploads/profilePics/${req.file.filename}`,
+      avatarUrl: `uploads/profilePics/${newFileName}`,
     })
 
     res.json({
@@ -52,7 +65,8 @@ const createUser = async (req, res) => {
 
     res.status(500).json({
       status: 'FAILED',
-      message: 'Failed to create User!'
+      message: 'Failed to create User!',
+      error
     })
 
   }
@@ -63,11 +77,31 @@ const updateUser = async (req, res) => {
 
   try {
 
-    console.log('teste')
-
     const { id } = req.params
-    const { fullName, bio } = req.body
-    await User.findByIdAndUpdate(id, { fullName, bio, avatarUrl: `uploads/profilePics/${req.file.filename}`})
+    const { username, fullName, bio } = req.body
+
+    // To change the correct file name
+
+    if(req.file) {
+
+      const ext = path.extname(req.file.originalname)
+
+      const newFileName = `${username}-${Date.now()}${ext}`
+
+      const oldPath = req.file.path
+      const newPath = path.join(path.dirname(oldPath), newFileName)
+
+      await fs.rename(oldPath, newPath)
+
+      const user = await User.findByIdAndUpdate(id)
+
+      user.avatarUrl = `/uploads/profilePics/${newFileName}`
+
+      await user.save()
+
+    }
+
+    await User.findByIdAndUpdate(id, { username, fullName, bio })
 
     res.json({
       status: 'OK',
@@ -76,9 +110,12 @@ const updateUser = async (req, res) => {
 
   } catch(error) {
 
+    console.log(error)
+
     res.status(500).json({
       status: 'FAILED',
-      message: 'Failed to update user'
+      message: 'Failed to update user',
+      error: error
     })
 
   }
