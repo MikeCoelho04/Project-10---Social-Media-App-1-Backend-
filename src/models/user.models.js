@@ -21,11 +21,11 @@ const userSchema = mongoose.Schema({
   avatarUrl: {
     type: String,
   },
-  followers: {
+  numberOfFollowers: {
     type: Number,
     default: 0,
   },
-  following: {
+  numberOfFollowing: {
     type: Number,
     default: 0,
   },
