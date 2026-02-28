@@ -23,3 +23,5 @@ One very import part of the post model is the media whcih is designed by mediaUr
 
 
 every request gives any type of details: it can be data, or messages: error messages, or display messages, so the user can be always informed of whats going on.
+
+Quando se elimina um user, quem ele segue perde um follower automatico, os seus posts, comentários e likes.

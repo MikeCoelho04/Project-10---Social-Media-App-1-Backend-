@@ -5,9 +5,10 @@ const createFollow = async (req, res) => {
 
   try {
 
+    const { followingId } = req.params
+
     const { followerId } = req.body
     
-    const { followingId } = req.params
 
     if(!followerId) {
       return res.status(400).json ({
@@ -27,8 +28,11 @@ const createFollow = async (req, res) => {
 
     if(deleted) {
 
-      await User.findByIdAndUpdate(followerId, { $inc: { following: -1 } })
-      await User.findByIdAndUpdate(followingId, { $inc: { followers: -1 } })
+      // Trocar isto para receber numero.
+      // Colocar no follow array para mostrar o id de quem segue ou é seguido, depois com populate mostrar userName e fullName.
+
+      await User.findByIdAndUpdate(followerId, { $inc: { numberOfFollowing: -1 } })
+      await User.findByIdAndUpdate(followingId, { $inc: { numberOfFollowers: -1 } })
 
       return res.json({
         status: 'OK',
@@ -39,8 +43,8 @@ const createFollow = async (req, res) => {
 
     await Follow.create({ followerId, followingId })
 
-    await User.findByIdAndUpdate(followerId, { $inc: { following: 1 } })
-    await User.findByIdAndUpdate(followingId, { $inc: { followers: 1 } })
+    await User.findByIdAndUpdate(followerId, { $inc: { numberOfFollowing: 1 } })
+    await User.findByIdAndUpdate(followingId, { $inc: { numberOfFollowers: 1 } })
 
     res.json({
       status: 'OK',
@@ -66,11 +70,14 @@ const fetchFollowers = async (req, res) => {
 
     const { userId } = req.params
 
-    const data = await User.findById(userId)
+    const data = await Follow.find({ followingId: userId }).select('followerId -_id').populate({
+      path: 'followerId',
+      select: 'username, fullName'
+    }).lean()
 
     res.json({
       status: 'OK',
-      data: data.followers
+      data: data
     })
 
   } catch(error) {
@@ -90,7 +97,22 @@ const fetchFollowings = async (req, res) => {
 
   try {
 
+    const { userId } = req.params
+    
+    const data = await Follow.find({ followerId: userId })
+
+    res.json({
+      status: 'OK',
+      data,
+    })
+
   } catch(error) {
+
+    console.log(error)
+    res.json({
+      status: 'FAILED',
+      message: 'Failed to show followings'
+    })
 
   }
 

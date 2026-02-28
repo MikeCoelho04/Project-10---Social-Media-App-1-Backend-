@@ -1,6 +1,7 @@
 const Post = require('../models/post.models')
 const User = require('../models/user.models')
 const Like = require('../models/like.models')
+const Comment = require('../models/comment.models')
 const path = require('path')
 const fs = require('fs/promises')
 const mongoose = require('mongoose')
@@ -148,6 +149,22 @@ const deletePost = async (req, res) => {
 
     const { id } = req.params
 
+    const post = await Post.findById(id).select('author').lean()
+
+    if(!post) {
+      return res.status(404).json({
+        status: 'FAILED',
+        message: 'Post not found'
+      })
+    }
+
+    // Delete post respective comments and likes
+
+    await Comment.deleteMany({ id })
+    await Like.deleteMany({ id })
+
+    await User.findByIdAndUpdate(post.author, { $inc: { numberOfPosts: -1 } })
+
     await Post.findByIdAndDelete(id)
 
     res.json({
@@ -156,6 +173,8 @@ const deletePost = async (req, res) => {
     })
 
   } catch(error) {
+
+    console.log(error)
 
     res.status(500).json({
       status: 'FAILED',
