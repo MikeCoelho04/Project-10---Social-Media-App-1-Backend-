@@ -10,8 +10,6 @@ const fetchPosts = async (req, res) => {
 
   try {
 
-    // const posts = await Post.find({ author }).populate('author', 'username fullName').populate('likes', 'username fullName')
-
     const posts = await Post.find()
 
     if(posts.length == 0) {
@@ -20,6 +18,30 @@ const fetchPosts = async (req, res) => {
         message: 'This app doesnt have any posts yet'
       })
     }
+
+    res.json ({
+      status: 'OK',
+      data: posts,
+    })
+
+  } catch(error) {
+
+    res.status(500).json ({
+      status: 'FAILED',
+      message: 'Something went wrong',
+    })
+
+  }
+
+}
+
+const fetchSinglePost = async (req, res) => {
+
+  try {
+
+    const { postId } = req.params
+
+    const posts = await Post.findById(postId)
 
     res.json ({
       status: 'OK',
@@ -187,6 +209,7 @@ const deletePost = async (req, res) => {
 
 module.exports = {
   fetchPosts,
+  fetchSinglePost,
   createPost,
   updatePost,
   deletePost,

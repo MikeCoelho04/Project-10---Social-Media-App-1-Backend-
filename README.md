@@ -26,62 +26,26 @@ src/
 │   ├── user.controllers.js
 │   ├── post.controllers.js
 │   ├── comment.controllers.js
+│   ├── like.controllers.js
 │   └── follow.controllers.js
 │
 ├── models/
-│   ├── User.js
-│   ├── Post.js
-│   ├── Comment.js
-│   ├── Like.js
-│   └── Follow.js
+│   ├── user.models.js
+│   ├── post.models.js
+│   ├── comment.models.js
+│   ├── like.models.js
+│   └── follow.models.js
 │
 ├── routes/
 │   ├── user.routes.js
 │   ├── post.routes.js
 │   ├── comment.routes.js
+│   ├── like.routes.js
 │   └── follow.routes.js
 │
-├── config/
-│   └── db.js
 │
-├── app.js
-└── server.js
-```
+├── index.js
 
----
-
-# ⚙️ Installation & Setup
-
-## 1️⃣ Clone the repository
-
-```bash
-git clone <repository_url>
-cd social-media-backend
-```
-
-## 2️⃣ Install dependencies
-
-```bash
-npm install
-```
-
-## 3️⃣ Create a `.env` file in the root directory
-
-```
-PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/social-media-app
-```
-
-## 4️⃣ Start the server
-
-```bash
-npm run dev
-```
-
-or
-
-```bash
-npm start
 ```
 
 ---
@@ -175,6 +139,7 @@ npm start
 | POST   | /users | Create a user |
 | GET    | /users | Get all users |
 | GET    | /users/:id | Get single user |
+| PATCH  | /users/:id | Update a user |
 | DELETE | /users/:id | Delete user (cascade delete) |
 
 ### Deleting a User will:
@@ -192,9 +157,10 @@ npm start
 
 | Method | Endpoint | Description |
 |--------|----------|------------|
-| POST   | /posts | Create post |
-| GET    | /posts | Get all posts |
-| GET    | /posts/:id | Get single post |
+| POST   | /posts     | Create post |
+| GET    | /posts     | Get all posts |
+| GET    | /posts/:id | Get single posts |
+| PATCH  | /posts/:id | Update a post |
 | DELETE | /posts/:id | Delete post |
 
 ### Deleting a Post will:
@@ -211,6 +177,8 @@ npm start
 |--------|----------|------------|
 | POST   | /posts/:postId/comments | Create comment |
 | GET    | /posts/:postId/comments | Get post comments |
+| GET    | /comments/:commentId | Get comment |
+| PATCH  | /comments/:commentId | Update comment |
 | DELETE | /comments/:id | Delete comment |
 
 Deleting a comment updates:
@@ -223,7 +191,6 @@ Deleting a comment updates:
 | Method | Endpoint | Description |
 |--------|----------|------------|
 | POST   | /posts/:postId/like | Toggle like |
-| GET    | /posts/:postId/likes | Get post likes |
 
 Features:
 - One like per user per post
@@ -252,8 +219,6 @@ Features:
 | Status Code | Meaning |
 |------------|---------|
 | 400 | Invalid request or ObjectId |
-| 404 | Resource not found |
-| 409 | Conflict (duplicate follow/like) |
 | 500 | Internal server error |
 
 ---
@@ -291,20 +256,6 @@ This project ensures:
 
 ---
 
-# 🧪 Testing
-
-You can test the API using:
-
-- Postman
-- Thunder Client
-- Insomnia
-
-Make sure to:
-- Use valid MongoDB ObjectIds
-- Include required headers (e.g., `x-user-id` for follow/like actions)
-
----
-
 # 🎯 Features Implemented
 
 - User management
@@ -318,27 +269,3 @@ Make sure to:
 - Proper REST structure
 
 ---
-
-# 📌 Future Improvements
-
-- JWT Authentication
-- Pagination (cursor-based)
-- User feed endpoint
-- Search functionality
-- Rate limiting
-- Docker support
-- Unit and integration tests
-
----
-
-# 👨‍💻 Author
-
-Developed for academic purposes using:
-
-**Node.js + Express.js + MongoDB**
-
----
-
-# 📄 License
-
-This project is for educational purposes only.

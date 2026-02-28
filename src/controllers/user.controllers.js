@@ -36,6 +36,30 @@ const fetchUsers = async (req, res) => {
 
 }
 
+const fetchSingleUser = async (req, res) => {
+
+  try {
+
+    const { id } = req.params
+
+    const users = await User.findById(id)
+
+    res.json({
+      status: 'OK',
+      data: users,
+    })
+
+  } catch(error) {
+
+    res.status(500).json({
+      status: 'FAILED',
+      message: 'Something went wrong'
+    })
+
+  }
+
+}
+
 const createUser = async (req, res) => {
 
   try {
@@ -261,6 +285,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   fetchUsers,
+  fetchSingleUser,
   createUser,
   updateUser,
   deleteUser,

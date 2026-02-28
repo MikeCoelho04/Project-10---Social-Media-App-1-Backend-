@@ -4,12 +4,15 @@ const upload = require('../middlewares/upload')
 
 const {
   fetchUsers,
+  fetchSingleUser,
   createUser,
   updateUser,
   deleteUser,
 } = require('../controllers/user.controllers')
 
 router.get('/users', fetchUsers)
+
+router.get('/users/:id', fetchSingleUser)
 
 router.post('/users', upload.single('avatarUrl'), createUser)
 
