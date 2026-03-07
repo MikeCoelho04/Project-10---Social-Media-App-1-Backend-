@@ -1,271 +1,387 @@
-# 📱 Social Media App – Backend
+# 🔐 Secure Auth API – User Login & Registration
 
-A RESTful backend API for a Social Media application built with **Node.js**, **Express.js**, and **MongoDB**.
+This project implements a **secure authentication system** for a Social Media backend using **Node.js**, **Express.js**, **MongoDB**, and **JWT (JSON Web Tokens)**.
 
-This project manages users, posts, comments, likes, and follow relationships while ensuring data consistency and cascade deletion logic.
+The goal of this module is to provide a **secure, scalable authentication layer** that allows users to register, login, and access protected resources using authentication tokens.
 
----
-
-# 🚀 Tech Stack
-
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- REST API Architecture
-- MVC Pattern
+This project focuses specifically on **secure authentication practices**, including password hashing, token-based authentication, and protected routes.
 
 ---
 
-# 📂 Project Structure
+# 🚀 Technologies Used
 
-```
-src/
-│
-├── controllers/
-│   ├── user.controllers.js
-│   ├── post.controllers.js
-│   ├── comment.controllers.js
-│   ├── like.controllers.js
-│   └── follow.controllers.js
-│
-├── models/
-│   ├── user.models.js
-│   ├── post.models.js
-│   ├── comment.models.js
-│   ├── like.models.js
-│   └── follow.models.js
-│
-├── routes/
-│   ├── user.routes.js
-│   ├── post.routes.js
-│   ├── comment.routes.js
-│   ├── like.routes.js
-│   └── follow.routes.js
-│
-│
-├── index.js
-
-```
+- **Node.js**
+- **Express.js**
+- **MongoDB**
+- **Mongoose**
+- **JWT (JSON Web Tokens)**
+- **bcrypt**
+- **dotenv**
 
 ---
 
-# 🗄️ Database Models
+# 🎯 Project Goals
 
-## 👤 User
+The objective of this project is to implement a **secure authentication API** that allows:
+
+- User registration
+- User login
+- Secure password storage
+- Token-based authentication
+- Protected routes using middleware
+- Secure user identification using JWT
+
+---
+
+# 🗄️ Database Model
+
+## 👤 User Model
 
 ```js
 {
-  username: String,
-  fullName: String,
   email: String,
-  numberOfPosts: { type: Number, default: 0 },
-  numberOfFollowers: { type: Number, default: 0 },
-  numberOfFollowing: { type: Number, default: 0 },
+  username: String,
+  password: String, // hashed with bcrypt
+  fullName: String,
+  bio: String,
+  avatarUrl: String,
+  numberOfFollowers: Number,
+  numberOfFollowing: Number,
+  numberOfPosts: Number,
   createdAt,
   updatedAt
 }
 ```
 
+### Security Rules
+
+- Passwords are **never stored in plain text**
+- Passwords are **hashed using bcrypt**
+- Password hashes are **never returned in API responses**
+
 ---
 
-## 📝 Post
+# 🔑 Authentication Flow
 
-```js
+## 1️⃣ User Registration
+
+User creates an account.
+
+```
+POST /users/signup
+```
+
+### Request Body
+
+```json
 {
-  authorId: { type: ObjectId, ref: "User" },
-  content: String,
-  likeCount: { type: Number, default: 0 },
-  commentCount: { type: Number, default: 0 },
-  createdAt,
-  updatedAt
+  "username": "johndoe",
+  "fullName": "John Doe",
+  "email": "john@email.com",
+  "password": "securePassword123"
+}
+```
+
+### Response
+
+```json
+{
+  "status": "OK",
+  "message": "User registered successfully"
+}
+```
+
+### Security Steps
+
+- Validate user input
+- Check if email already exists
+- Hash password using **bcrypt**
+- Store user in database
+
+---
+
+## 2️⃣ User Login
+
+Users authenticate with their credentials.
+
+```
+POST /users/signin
+```
+
+### Request Body
+
+```json
+{
+  "email": "john@email.com",
+  "password": "securePassword123"
+}
+```
+
+### Response
+
+```json
+{
+  "status": "OK",
+  "token": "JWT_TOKEN"
 }
 ```
 
 ---
 
-## 💬 Comment
+# 🔐 JWT Token
 
-```js
+After successful login, the server generates a **JSON Web Token (JWT)**.
+
+The token contains the user's identity and is used to authenticate future requests.
+
+Example token payload:
+
+```json
 {
-  postId: { type: ObjectId, ref: "Post" },
-  authorId: { type: ObjectId, ref: "User" },
-  content: String,
-  createdAt,
-  updatedAt
+  "id": "64fa...",
+  "username": "johndoe"
 }
 ```
 
+Token settings:
+
+- Signed using **JWT_SECRET**
+- Short expiration time for security
+
 ---
 
-## ❤️ Like
+# 🛡️ Protected Routes
+
+Protected routes require a valid **JWT token**.
+
+The client must send the token in the **header**:
+
+```
+Authorization: Bearer <token>
+```
+
+---
+
+# 🔑 Authentication vs Authorization
+
+Authentication → Who the user is
+
+Authorization → What the user is allowed to do
+
+---
+
+---
+
+# 🔐 Authorization & Middleware
+
+To ensure that only authorized users can perform certain actions, the API implements several middleware functions responsible for validating authentication and permissions.
+
+These middlewares act as a **security layer** between the request and the controller logic.
+
+---
+
+## 🧾 Authentication Middleware
+
+### `isUserLoggedIn`
+
+This middleware verifies whether a user is authenticated.
+
+It checks if the request contains a valid **JWT token** in the `Authorization` header.
+
+```
+Authorization: Bearer <token>
+```
+
+If the token is valid:
+
+- The token is verified using `jwt.verify`
+- The user payload is decoded
+- User information is attached to `req.user`
+
+Example:
 
 ```js
-{
-  postId: { type: ObjectId, ref: "Post" },
-  userId: { type: ObjectId, ref: "User" },
-  createdAt
+req.user = {
+  id: "user_id",
+  username: "username"
 }
 ```
 
----
-
-## 🔄 Follow
-
-```js
-{
-  followerId: { type: ObjectId, ref: "User" },
-  followingId: { type: ObjectId, ref: "User" },
-  createdAt
-}
-```
-
-### Unique Constraint
+If the token is missing or invalid, the request is rejected with:
 
 ```
-{ followerId: 1, followingId: 1 }  // prevents duplicate follows
+401 Unauthorized
 ```
 
 ---
 
-# 📌 API Endpoints
+### `isUserLoggedOff`
+
+This middleware ensures that only **unauthenticated users** can access certain routes.
+
+It is typically used in authentication endpoints such as:
+
+- `/users/signup`
+- `/users/signin`
+
+If a valid token is already present, the request will be rejected to prevent already authenticated users from accessing login or signup routes.
 
 ---
 
-# 👤 Users
+# 👤 Ownership Authorization
 
-| Method | Endpoint | Description |
-|--------|----------|------------|
-| POST   | /users | Create a user |
-| GET    | /users | Get all users |
-| GET    | /users/:id | Get single user |
-| PATCH  | /users/:id | Update a user |
-| DELETE | /users/:id | Delete user (cascade delete) |
+Some actions should only be performed by the **owner of a resource**.
 
-### Deleting a User will:
-
-- Delete all user's posts
-- Delete all user's comments
-- Delete all user's likes
-- Delete all follow relationships
-- Update follower/following counters
-- Update like/comment counters in affected posts
+The following middlewares enforce these ownership rules.
 
 ---
 
-# 📝 Posts
+## 👤 `isProfileOwner`
 
-| Method | Endpoint | Description |
-|--------|----------|------------|
-| POST   | /posts     | Create post |
-| GET    | /posts     | Get all posts |
-| GET    | /posts/:id | Get single posts |
-| PATCH  | /posts/:id | Update a post |
-| DELETE | /posts/:id | Delete post |
+Ensures that a user can only modify **their own profile**.
 
-### Deleting a Post will:
+Example protected actions:
 
-- Delete all comments of that post
-- Delete all likes of that post
-- Decrement author's `numberOfPosts`
+- Updating profile information
+- Deleting account
+- Updating avatar or bio
 
----
+Logic:
 
-# 💬 Comments
+```
+req.user.id === req.params.userId
+```
 
-| Method | Endpoint | Description |
-|--------|----------|------------|
-| POST   | /posts/:postId/comments | Create comment |
-| GET    | /posts/:postId/comments | Get post comments |
-| GET    | /comments/:commentId | Get comment |
-| PATCH  | /comments/:commentId | Update comment |
-| DELETE | /comments/:id | Delete comment |
+If the authenticated user is not the profile owner:
 
-Deleting a comment updates:
-- `commentCount` of the related post
+```
+403 Forbidden
+```
 
 ---
 
-# ❤️ Likes
+## 📝 `isPostOwner`
 
-| Method | Endpoint | Description |
-|--------|----------|------------|
-| POST   | /posts/:postId/like | Toggle like |
+Ensures that only the **author of a post** can modify or delete it.
 
-Features:
-- One like per user per post
-- Updates `likeCount`
+Example protected actions:
 
----
+- Editing a post
+- Deleting a post
 
-# 🔄 Follows
+The middleware checks whether the authenticated user matches the post's `authorId`.
 
-| Method | Endpoint | Description |
-|--------|----------|------------|
-| POST | /users/:id/follow-toggle | Follow / Unfollow user |
-| GET  | /users/:id/followers | Get followers |
-| GET  | /users/:id/following | Get following |
+```
+req.user.id === post.authorId
+```
 
-Features:
-- Prevents self-follow
-- Prevents duplicate follows
-- Maintains follower/following counters
-- Uses populate to return `username` and `fullName`
+If the user is not the owner:
+
+```
+403 Forbidden
+```
 
 ---
 
-# 🛡️ Error Handling
+## 💬 `isCommentOwner`
+
+Ensures that only the **author of a comment** can modify or delete that comment.
+
+Example protected actions:
+
+- Editing a comment
+- Deleting a comment
+
+The middleware verifies:
+
+```
+req.user.id === comment.authorId
+```
+
+If the user is not the owner:
+
+```
+403 Forbidden
+```
+
+---
+
+# 🛡️ Security Benefits
+
+These middleware layers ensure that:
+
+- Only authenticated users can access protected resources
+- Users cannot impersonate other users
+- Users cannot modify or delete resources that they do not own
+- Authentication and authorization logic is centralized and reusable
+
+This approach follows best practices for **secure API design**.
+
+---
+
+# 🛡️ Security Measures Implemented
+
+This project implements several security practices:
+
+### Password Hashing
+
+Passwords are hashed using **bcrypt** before being stored in the database.
+
+```
+bcrypt.hash(password, saltRounds)
+```
+
+---
+
+### JWT Authentication
+
+JWT tokens are used for stateless authentication.
+
+Benefits:
+
+- No server-side session storage
+- Secure identification of users
+- Scalable authentication system
+
+---
+
+### Protected Routes
+
+Sensitive operations require a valid authentication token.
+
+This prevents unauthorized users from accessing protected resources.
+
+---
+
+### Environment Variables
+
+Sensitive values such as the JWT secret and database connection are stored in `.env` files.
+
+---
+
+# ⚠️ Error Handling
+
+The API returns meaningful HTTP status codes.
 
 | Status Code | Meaning |
-|------------|---------|
-| 400 | Invalid request or ObjectId |
+|------|------|
+| 400 | Invalid request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Resource not found |
 | 500 | Internal server error |
 
 ---
 
-# 🔥 Data Integrity & Consistency
+# 📸 API Testing Snapshots
 
-This project ensures:
+Postman snapshots of the main authentication routes are included to demonstrate:
 
-- Unique follow relationships
-- Unique likes per post
-- Cascade deletion logic
-- Counter synchronization
-- Proper ObjectId validation
-- Clean separation of concerns (MVC)
+- Successful registration
+- Successful login
+- Invalid credentials
+- Unauthorized access to protected routes
 
----
-
-# 📈 Performance Considerations
-
-- Indexed foreign keys
-- Compound unique indexes
-- Efficient `updateMany`
-- Lean queries
-- Controlled field population
-
----
-
-# 🧠 Architectural Decisions
-
-- MVC structure
-- RESTful routing
-- Relational collections (Follow, Like) instead of large arrays
-- Counter fields for optimized reads
-- Cascade deletion handled at controller level
-
----
-
-# 🎯 Features Implemented
-
-- User management
-- Post management
-- Comment system
-- Like system
-- Follow system
-- Toggle follow logic
-- Cascade deletion
-- Counter synchronization
-- Proper REST structure
+These screenshots confirm that the authentication flow works correctly.
 
 ---

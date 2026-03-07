@@ -3,21 +3,33 @@ const router = express.Router()
 const upload = require('../middlewares/upload')
 
 const {
+  isUserLoggedIn,
+  isUserLoggedOff,
+  isProfileOwner,
+} = require('../middlewares/auth.middlewares')
+
+const {
   fetchUsers,
   fetchSingleUser,
-  createUser,
+  userSignin,
+  userLogin,
+  userLogout,
   updateUser,
   deleteUser,
 } = require('../controllers/user.controllers')
 
-router.get('/users', fetchUsers)
+router.get('/users', isUserLoggedIn, fetchUsers)
 
-router.get('/users/:id', fetchSingleUser)
+router.get('/users/:id', isUserLoggedIn, fetchSingleUser)
 
-router.post('/users', upload.single('avatarUrl'), createUser)
+router.post('/users/signup', isUserLoggedOff, upload.single('avatarUrl'), userSignin)
 
-router.patch('/users/:id', upload.single('avatarUrl'), updateUser)
+router.post('/users/signin', isUserLoggedOff, userLogin)
 
-router.delete('/users/:id', deleteUser)
+router.post('/users/logout', isUserLoggedIn, userLogout)
+
+router.patch('/users/:id', isUserLoggedIn, isProfileOwner, upload.single('avatarUrl'), updateUser)
+
+router.delete('/users/:id', isUserLoggedIn, isProfileOwner, deleteUser)
 
 module.exports = router

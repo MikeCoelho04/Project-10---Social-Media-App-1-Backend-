@@ -8,7 +8,8 @@ const togglePostlike = async (req, res) => {
   try {
 
     const { postId } = req.params
-    const { userId } = req.body
+
+    const userId = req._id
 
     console.log(postId)
 

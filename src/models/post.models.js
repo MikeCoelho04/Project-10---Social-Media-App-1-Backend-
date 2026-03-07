@@ -11,7 +11,6 @@ const postSchema = mongoose.Schema({
   content: {
     type: String,
     required: true,
-    minLength: 1,
   },
   mediaUrls: {
     type: String,

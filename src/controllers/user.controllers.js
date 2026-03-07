@@ -7,12 +7,23 @@ const Post = require('../models/post.models')
 const Like = require('../models/like.models')
 const Comment = require('../models/comment.models')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const fetchUsers = async (req, res) => {
 
   try {
 
     const users = await User.find()
+
+    if(!users) {
+
+      return res.json({
+        status: 'OK',
+        message: 'There are no users to show'
+      })
+
+    }
 
     users.map(user => {
 
@@ -60,11 +71,11 @@ const fetchSingleUser = async (req, res) => {
 
 }
 
-const createUser = async (req, res) => {
+const userSignin = async (req, res) => {
 
   try {
 
-    const { email, username, fullName, bio } = req.body
+    const { email, username, password, fullName, bio } = req.body
 
     // To change to the correct file name (avatarUrl)
 
@@ -77,9 +88,12 @@ const createUser = async (req, res) => {
 
     await fs.rename(oldPath, newPath)
 
+    const encryptedPassword = await bcrypt.hash(password, 10)
+
     await User.create({
       email,
       username,
+      password: encryptedPassword,
       fullName,
       bio,
       avatarUrl: `uploads/profilePics/${newFileName}`,
@@ -96,6 +110,78 @@ const createUser = async (req, res) => {
       status: 'FAILED',
       message: 'Failed to create User!',
       error
+    })
+
+  }
+
+}
+
+const userLogin = async (req, res) => {
+
+  try {
+
+    const { email, password } = req.body
+
+    const user = await User.findOne( { email } ).exec()
+
+    if(!user) {
+      res.status(401).json({
+        status: 'FAILED',
+        message: 'Invalid email or password, please try again'
+      })
+    }
+
+    const pwd = await bcrypt.compare(password, user.password)
+    
+    if(!pwd) {
+      res.status(401).json({
+        status: 'FAILED',
+        message: 'Invalid email or password, please try again'
+      })
+    }
+
+    const { _id } = user
+ 
+    const token = jwt.sign({ _id }, process.env.PRIVATE_KEY, { expiresIn: '7 days' })
+    
+    res.json({
+      status: 'OK',
+      message: 'User login successfully',
+      token,
+    })
+
+
+  } catch(error) {
+
+    console.log(error)
+
+    res.json({
+      status: 'FAILED',
+      message: 'Something went wrong'
+    })
+
+  }
+
+}
+
+const userLogout = async (req, res) => {
+
+  const userId = req._id
+
+  const user = await User.findById(userId)
+
+  try {
+
+    res.json({
+      status: 'OK',
+      message: `You logged out successfully. We hope to see you soon. Have a nice break ${user.username}`
+    })
+
+  } catch(error) {
+
+    res.status(401).json({
+      status: 'FAILED',
+      message: 'Failed to logout'
     })
 
   }
@@ -286,7 +372,9 @@ const deleteUser = async (req, res) => {
 module.exports = {
   fetchUsers,
   fetchSingleUser,
-  createUser,
+  userSignin,
+  userLogin,
+  userLogout,
   updateUser,
   deleteUser,
 }

@@ -63,7 +63,9 @@ const createPost = async (req, res) => {
 
   try {
 
-    const { author, content } = req.body
+    const author = req._id
+
+    const { content } = req.body
 
     const user = await User.findById(author)
 
@@ -122,21 +124,21 @@ const updatePost = async (req, res) => {
 
   try {
 
-    const { id } = req.params
+    const { postId } = req.params
     const { content } = req.body
 
     if(req.file) {
 
       const ext = path.extname(req.file.originalname)
 
-      const newFileName = `post-${id}-${Date.now()}${ext}`
+      const newFileName = `post-${postId}-${Date.now()}${ext}`
 
       const oldPath = req.file.path
       const newPath = path.join(path.dirname(oldPath), newFileName)
 
       await fs.rename(oldPath, newPath)
 
-      const post = await Post.findByIdAndUpdate(id)
+      const post = await Post.findByIdAndUpdate(postId)
 
       post.mediaUrls = `/uploads/postsMedia/${newFileName}`
 
@@ -145,7 +147,7 @@ const updatePost = async (req, res) => {
     }
 
 
-    await Post.findByIdAndUpdate(id, { content })
+    await Post.findByIdAndUpdate(postId, { content })
 
     res.json({
       status: 'OK',
@@ -169,9 +171,9 @@ const deletePost = async (req, res) => {
 
   try {
 
-    const { id } = req.params
+    const { postId } = req.params
 
-    const post = await Post.findById(id).select('author').lean()
+    const post = await Post.findById(postId).select('author').lean()
 
     if(!post) {
       return res.status(404).json({
@@ -182,12 +184,12 @@ const deletePost = async (req, res) => {
 
     // Delete post respective comments and likes
 
-    await Comment.deleteMany({ id })
-    await Like.deleteMany({ id })
+    await Comment.deleteMany({ postId })
+    await Like.deleteMany({ postId })
 
     await User.findByIdAndUpdate(post.author, { $inc: { numberOfPosts: -1 } })
 
-    await Post.findByIdAndDelete(id)
+    await Post.findByIdAndDelete(postId)
 
     res.json({
       status: 'Ok',

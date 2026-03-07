@@ -7,7 +7,7 @@ const createFollow = async (req, res) => {
 
     const { followingId } = req.params
 
-    const { followerId } = req.body
+    followerId = req._id
     
 
     if(!followerId) {
@@ -26,10 +26,7 @@ const createFollow = async (req, res) => {
 
     const deleted = await Follow.findOneAndDelete( {followerId, followingId} )
 
-    if(deleted) {
-
-      // Trocar isto para receber numero.
-      // Colocar no follow array para mostrar o id de quem segue ou é seguido, depois com populate mostrar userName e fullName.
+    if(deleted) {-
 
       await User.findByIdAndUpdate(followerId, { $inc: { numberOfFollowing: -1 } })
       await User.findByIdAndUpdate(followingId, { $inc: { numberOfFollowers: -1 } })

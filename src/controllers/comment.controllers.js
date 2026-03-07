@@ -8,7 +8,9 @@ const createComment = async (req, res) => {
 
     const { postId } = req.params
 
-    const { authorId, text } = req.body
+    const { text } = req.body
+
+    const authorId = req._id
 
     const user = await User.findById(authorId)
 
