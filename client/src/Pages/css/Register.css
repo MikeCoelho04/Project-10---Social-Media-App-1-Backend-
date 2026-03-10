@@ -1,0 +1,132 @@
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 1rem;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 32rem;
+  background-color: white;
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.1);
+}
+
+.signup-header {
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.signup-header > h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.signup-header > p {
+  margin: 0;
+  color: rgb(108, 117, 125);
+  font-size: 15px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.signup-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.signup-input-group > label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.signup-input-group > input,
+.signup-input-group > textarea {
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.signup-input-group > input:focus,
+.signup-input-group > textarea:focus {
+  border-color: rgb(13, 110, 253);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.signup-input-group > textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.signup-input-group > input[type="file"] {
+  padding: 10px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.signup-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.signup-footer {
+  border-top: 1px solid lightgray;
+  margin-top: 20px;
+  padding-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.signup-footer > a {
+  color: rgb(13, 110, 253);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Alert Messages */
+
+#password-check {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: rgb(218, 40, 40);
+}
+
+.error-message {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: rgb(218, 40, 40);
+}
+
+.error-message > span {
+  font-size: 12px;
+  color: rgb(218, 40, 40)
+}
+
+.input-error {
+  border: 1px solid rgb(218, 40, 40) !important;
+  background-color: rgba(218, 40, 40, 0.075);
+}

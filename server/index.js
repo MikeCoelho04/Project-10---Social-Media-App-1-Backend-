@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const { urlencoded } = require('body-parser')
+const cors = require('cors')
 dotenv.config()
 
 const userRoutes = require('./src/routes/user.routes')
@@ -12,7 +13,13 @@ const followRoutes = require('./src/routes/follow.routes')
 
 const app = express()
 
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN,
+  credentials: true,
+}))
+
 app.use(express.urlencoded({extended: false}))
+app.use(express.json())
 
 app.use('/uploads', express.static('uploads'))
 

@@ -1,0 +1,286 @@
+.right-side-container {
+  transition: 1.5s ease;
+  border: 1px solid rgba(0, 0, 0, 0.176);
+  border-radius: 16px;
+}
+
+.right-side-container:hover {
+  transform: translatey(5px);
+  transform: translateX(5px);
+  box-shadow: 7px 13px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.right-side-container > div {
+  padding: 1rem;
+}
+
+    /* FRIENDS REQUEST STYLES */
+
+.friends-request-card {
+  width: 22.1rem; 
+  margin: 0 0 1.25rem 0; 
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.1);
+}
+
+.friends-request-header {
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.friends-request-header > h5 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.friends-request-header > a {
+  border: 1px solid rgb(108, 117, 125);
+  color: rgb(108, 117, 125);
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: .5s ease;
+  cursor: pointer;
+}
+
+.friends-request-header > a:hover {
+  background-color: rgb(108, 117, 125);
+  color: white;
+}
+
+.latest-friends-request-span {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.friends-request-indivudal-card-global-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.friends-request-indivudal-card {
+  box-sizing: border-box;
+  border: 1px solid lightgray;
+  padding: 1rem;
+  border-radius: 1rem; 
+
+}
+
+.friends-request-indivudal-card > div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.success-button {
+  border: 1px solid rgb(13, 110, 253);
+  color: rgb(13, 110, 253);
+  padding: 6px 12px;
+  background-color: white;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: .5s ease;
+}
+
+.success-button:hover {
+  background-color: rgb(13, 110, 253);
+  color: white;
+}
+
+.mutual-button {
+  padding: 6px 12px;
+  border: 1px solid rgb(25, 135, 84);
+  color: rgb(25, 135, 84);
+  background-color: white;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: .5s ease;
+}
+
+.mutual-button:hover {
+  background-color: rgb(25, 135, 84);
+  color: white;
+}
+
+.decline-button {
+  padding: 6px 12px;
+  border: 1px solid rgb(220, 53, 69);
+  color: rgb(220, 53, 69);
+  background-color: white;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: .5s ease;
+}
+
+.decline-button:hover {
+  background-color: rgb(220, 53, 69);
+  color: white;
+}
+
+    /* MESSAGES CONTAINER */
+
+.messages-container {
+  width: 22.1rem; 
+  margin: 20px 0 20px 0; 
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.1);
+}
+
+.messages-header {
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.messages-header > h5 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.messages-header > a {
+  border: 1px solid rgb(108, 117, 125);
+  color: rgb(108, 117, 125);
+  background-color: white;
+  padding: 6px 12px;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: .5s ease;
+  cursor: pointer;
+}
+
+.messages-header > a:hover {
+  background-color: rgb(108, 117, 125);
+  color: white;
+}
+
+.messages-invidual-container {
+  margin-top: 1rem; 
+  border: 1px solid lightgray; 
+  box-sizing: border-box;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.messages-invidual-container > div {
+  display: flex;
+  gap: 8px;
+}
+
+.messages-invidual-container > div > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.reply-button {
+  color: rgb(13, 110, 253);
+  border: 1px solid rgb(13, 110, 253);
+  background-color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: .5s ease;
+}
+
+.reply-button:hover {
+  color: white;
+  background-color: rgb(13, 110, 253);
+}
+
+.open-button {
+  color: rgb(108, 117, 125);
+  border: 1px solid rgb(108, 117, 125);
+  background-color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: .5s ease;
+}
+
+.open-button:hover {
+  color: white;
+  background-color: rgb(108, 117, 125);
+}
+
+.messages-container > div > :last-child {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.recent-activity-container {
+  width: 22.1rem; 
+  margin: 0 0 1.25rem 0; 
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.1);
+}
+
+.recent-activity-container > div {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recent-activity-header {
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.recent-activity-header > h5 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.recent-activity-header > a {
+  border: 1px solid rgb(108, 117, 125);
+  color: rgb(108, 117, 125);
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: .5s ease;
+  cursor: pointer;
+}
+
+.recent-activity-header > a:hover {
+  background-color: rgb(108, 117, 125);
+  color: white;
+}
+
+.recent-activity-card {
+  border: 1px solid rgb(108, 117, 125);
+  padding: 1rem;
+  border-radius: 1rem;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.recent-activity-card > div {
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 1370px) {
+
+  #right-side-content {
+    display: none;
+  }
+
+}

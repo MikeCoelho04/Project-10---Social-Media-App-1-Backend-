@@ -77,16 +77,51 @@ const userSignin = async (req, res) => {
 
     const { email, username, password, fullName, bio } = req.body
 
+    // Checks for uniques values
+
+      // email
+
+    const existingEmail = await User.findOne({email})
+
+    if(existingEmail) {
+
+      return res.status(409).json({
+        status: 'FAILED',
+        message: 'This email is already in use!',
+        field: 'email',
+      })
+
+    }
+
+      // username
+
+    const existingUsername = await User.findOne({username})
+
+    if(existingUsername) {
+      
+      return res.status(409).json({
+        status: 'FAILED',
+        message: 'This username is already in use!',
+        field: 'username',
+      })
+      
+    }
+
     // To change to the correct file name (avatarUrl)
 
-    const ext = path.extname(req.file.originalname)
+    if(req.file) {
 
-    const newFileName = `${username}-${Date.now()}${ext}`
+      const ext = path.extname(req.file.originalname)
+  
+      const newFileName = `${username}-${Date.now()}${ext}`
+  
+      const oldPath = req.file.path
+      const newPath = path.join(path.dirname(oldPath), newFileName)
+  
+      await fs.rename(oldPath, newPath)
 
-    const oldPath = req.file.path
-    const newPath = path.join(path.dirname(oldPath), newFileName)
+    }
 
-    await fs.rename(oldPath, newPath)
 
     const encryptedPassword = await bcrypt.hash(password, 10)
 
@@ -96,7 +131,7 @@ const userSignin = async (req, res) => {
       password: encryptedPassword,
       fullName,
       bio,
-      avatarUrl: `uploads/profilePics/${newFileName}`,
+      avatarUrl: req.file ? `uploads/profilePics/${newFileName}` : undefined,
     })
 
     res.json({
@@ -105,6 +140,8 @@ const userSignin = async (req, res) => {
     })
 
   } catch (error) {
+
+    console.log(error)
 
     res.status(500).json({
       status: 'FAILED',
