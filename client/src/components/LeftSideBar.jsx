@@ -14,14 +14,14 @@ function LeftSideBar( { variant } ) {
   return(
     <div id="left-side-content">
 
-      {variant === 'home' && <ProfileResumeLinks />}
+      {variant === 'home' && <ProfileResumeLinks variant={variant} />}
       {variant === 'home' && <Shortcuts />}
       {variant === 'home' && <FriendsSuggestions />}
 
       {variant === 'profile' && <ProfileInfo />}
       {variant === 'profile' && <QuickLinks />}
 
-      {variant === 'friends' && <ProfileResumeLinks />}
+      {variant === 'friends' && <ProfileResumeLinks variant={variant} />}
 
     </div>  
   )

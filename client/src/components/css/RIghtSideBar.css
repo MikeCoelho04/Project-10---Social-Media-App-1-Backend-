@@ -4,6 +4,23 @@
   border-radius: 16px;
 }
 
+#right-side-content {
+  width: max-content;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: visible;
+  padding-bottom: 24px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#right-side-content::-webkit-scrollbar {
+  display: none;
+}
+
 .right-side-container:hover {
   transform: translatey(5px);
   transform: translateX(5px);
@@ -125,6 +142,22 @@
 .decline-button:hover {
   background-color: rgb(220, 53, 69);
   color: white;
+}
+
+.profile-pic-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
     /* MESSAGES CONTAINER */

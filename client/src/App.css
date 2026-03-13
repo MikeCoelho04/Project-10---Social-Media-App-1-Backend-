@@ -1,12 +1,18 @@
 html {
+  height: 100%;
   scrollbar-gutter: stable;
 }
 
 body {
+  height: 100%;
   margin: 0;
   padding: 0;
   background-color: #f7f8fc;
-  overflow-y: scroll;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
 }
 
 * {

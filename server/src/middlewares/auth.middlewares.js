@@ -8,7 +8,14 @@ const isUserLoggedIn = (req, res, next) => {
 
   try {
 
-    const { token } = req.headers
+    const token = req.cookies?.token
+
+    if(!token) {
+      return res.status(401).json({
+        status: 'FAILED',
+        message: 'You need to login first before access this content'
+      })
+    }
   
     const { _id } = jwt.verify(token, process.env.PRIVATE_KEY)
   
@@ -61,9 +68,15 @@ const isProfileOwner = (req, res, next) => {
 
   try {
 
-    const { token } = req.headers
-
     const { id } = req.params
+    const token = req.cookies?.token
+
+    if (!token) {
+      return res.status(403).json({
+        status: 'FAILED',
+        message: `You don't have permission to update/delete this user`
+      })
+    }
 
     const { _id } = jwt.verify(token, process.env.PRIVATE_KEY)
 
@@ -90,9 +103,16 @@ const isProfileOwner = (req, res, next) => {
 const isPostOwner = async (req, res, next) => {
 
   try {  
-    const { token } = req.headers
+    const token = req.cookies?.token
 
     const { postId } = req.params 
+
+    if (!token) {
+      return res.status(403).json({
+        status: 'FAILED',
+        message: `You don't have permission to update/delete this post.`
+      })
+    }
 
     const { _id } = jwt.verify(token, process.env.PRIVATE_KEY)
 
@@ -127,19 +147,38 @@ const isPostOwner = async (req, res, next) => {
 
 const isCommentOwner = async (req, res, next) => {
 
-  const { token } = req.headers
+  try {
 
-  const { _id } = jwt.verify(token, process.env.PRIVATE_KEY)
+    const token = req.cookies?.token
+    const { commentId } = req.params
 
-  const { commentId } = req.params
+    if (!token) {
+      return res.status(403).json({
+        status: 'FAILED',
+        message: `You don't have permision to update/delete this comment`
+      })
+    }
 
-  const { authorId } = await Comment.findById(commentId)
-  
-  if(_id == authorId.toString()) {
+    const { _id } = jwt.verify(token, process.env.PRIVATE_KEY)
+    const comment = await Comment.findById(commentId).select('authorId')
 
-    next()
+    if (!comment) {
+      return res.status(404).json({
+        status: 'FAILED',
+        message: 'Comment not found'
+      })
+    }
 
-  } else {
+    if(_id == comment.authorId.toString()) {
+      next()
+    } else {
+      res.status(403).json({
+        status: 'FAILED',
+        message: `You don't have permision to update/delete this comment`
+      })
+    }
+
+  } catch (error) {
 
     res.status(403).json({
       status: 'FAILED',

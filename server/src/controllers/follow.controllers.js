@@ -1,5 +1,6 @@
 const Follow = require('../models/follow.models')
 const User = require('../models/user.models')
+const FriendRequest = require('../models/friendsRequest.models')
 
 const createFollow = async (req, res) => {
 
@@ -7,7 +8,7 @@ const createFollow = async (req, res) => {
 
     const { followingId } = req.params
 
-    followerId = req._id
+    const followerId = req._id
     
 
     if(!followerId) {
@@ -24,15 +25,16 @@ const createFollow = async (req, res) => {
       })
     }
 
-    const deleted = await Follow.findOneAndDelete( {followerId, followingId} )
+    const deleted = await Follow.findOneAndDelete({ followerId, followingId })
 
-    if(deleted) {-
+    if (deleted) {
 
       await User.findByIdAndUpdate(followerId, { $inc: { numberOfFollowing: -1 } })
       await User.findByIdAndUpdate(followingId, { $inc: { numberOfFollowers: -1 } })
 
       return res.json({
         status: 'OK',
+        following: false,
         message: 'Unfollowed successfully'
       })
 
@@ -45,6 +47,7 @@ const createFollow = async (req, res) => {
 
     res.json({
       status: 'OK',
+      following: true,
       message: 'You are now following this user'
     })
 
@@ -97,6 +100,12 @@ const fetchFollowings = async (req, res) => {
     const { userId } = req.params
     
     const data = await Follow.find({ followerId: userId })
+      .select('followingId')
+      .populate({
+        path: 'followingId',
+        select: 'username fullName avatarUrl',
+      })
+      .lean()
 
     res.json({
       status: 'OK',
@@ -115,8 +124,51 @@ const fetchFollowings = async (req, res) => {
 
 }
 
+const getSuggestedFriends = async (req, res) => {
+
+  try {
+
+    const currentUserId = req._id
+    const excludedIdsFromQuery = req.query.excludedIds
+      ? req.query.excludedIds.split(',')
+      : []
+
+    const followingRelations = await Follow.find({ followerId: currentUserId}).select('followingId')
+
+    const followingIds = followingRelations.map((relation) => relation.followingId.toString())
+
+    const sentPendingRequests = await FriendRequest.find({
+      senderId: currentUserId,
+      status: 'pending',
+    }).select('receiverId')
+
+    const pendingReceiverIds = sentPendingRequests.map((r) => r.receiverId.toString())
+
+    const excludedIds = [currentUserId.toString(), ...followingIds, ...pendingReceiverIds, ...excludedIdsFromQuery]
+
+    const limit = Number(req.query.limit) || 3
+
+    const suggestedUsers = await User.find({_id: { $nin: excludedIds }}).select('-password -email').limit(limit)
+
+    return res.json({
+      status: 'OK',
+      data: suggestedUsers,
+    })
+
+  } catch (error) {
+
+    return res.status(500).json({
+      status: 'FAILED',
+      message: 'Failed to fetch suggested friends'
+    })
+
+  }
+
+}
+
 module.exports = {
   createFollow,
   fetchFollowers,
   fetchFollowings,
+  getSuggestedFriends,
 }

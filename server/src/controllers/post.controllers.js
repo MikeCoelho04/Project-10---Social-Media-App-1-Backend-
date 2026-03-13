@@ -11,10 +11,13 @@ const fetchPosts = async (req, res) => {
   try {
 
     const posts = await Post.find()
+      .populate('author', 'fullName username avatarUrl')
+      .sort({ createdAt: -1 })
 
     if(posts.length == 0) {
-      res.json({
+      return res.json({
         status: 'OK',
+        data: [],
         message: 'This app doesnt have any posts yet'
       })
     }
@@ -78,6 +81,13 @@ const createPost = async (req, res) => {
 
     }
 
+    if (!content && !req.file) {
+      return res.status(400).json({
+        status: "FAILED",
+        message: "A post must contain either text or media"
+      })
+    }
+
     const post = await Post.create({
       author,
       content,
@@ -87,20 +97,25 @@ const createPost = async (req, res) => {
 
     // To change to the correct file name
 
-    const ext = path.extname(req.file.originalname)
+    if(req.file) {
 
-    const newFileName = `post-${post._id}-${Date.now()}${ext}`
+      const ext = path.extname(req.file.originalname)
+  
+      const newFileName = `post-${post._id}-${Date.now()}${ext}`
+  
+      const oldPath = req.file.path
+      const newPath = path.join(path.dirname(oldPath), newFileName)
+  
+      await fs.rename(oldPath, newPath)
+  
+      const postId = await Post.findById(post._id)
+  
+      postId.mediaUrls = `/uploads/postsMedia/${newFileName}`
+  
+      await postId.save()
 
-    const oldPath = req.file.path
-    const newPath = path.join(path.dirname(oldPath), newFileName)
+    }
 
-    await fs.rename(oldPath, newPath)
-
-    const postId = await Post.findById(post._id)
-
-    postId.mediaUrls = `/uploads/postsMedia/${newFileName}`
-
-    await postId.save()
 
     res.json({
       status: 'OK',

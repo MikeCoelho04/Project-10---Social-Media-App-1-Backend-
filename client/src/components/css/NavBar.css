@@ -4,12 +4,35 @@
 
 #navbar {
   padding: 12px 0 !important;
-  border-bottom: 1px solid #e5e7ee;
-  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-bottom: 1px solid rgba(229, 231, 238, 0.7);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.58),
+    rgba(255, 255, 255, 0.34)
+  ) !important;
   font-size: 1.4375rem; 
   position: fixed;
+  top: 0;
   width: 100%;
   z-index: 999;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+#navbar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -18px;
+  height: 18px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(247, 248, 252, 0.5),
+    rgba(247, 248, 252, 0)
+  );
 }
 
 #navbar > :first-child {
@@ -150,6 +173,31 @@
   align-items: center;
 } 
 
+.hamburger-logout-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #0D6EFD;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hamburger-logout-button:hover {
+  color: #074cb3;
+}
+
+.hamburger-logout-button > span {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
     /* Account button */
 
 .account-buttons {
@@ -173,6 +221,180 @@
   border-color: #86b7fe;
   transition: ease .5s;
   background-color: rgb(247, 248, 252);
+}
+
+/* LOGOUT DROPDOWN */
+
+.account-menu-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.account-icon {
+  font-size: 20px;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background: white;
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.account-dropdown button {
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.account-dropdown button:hover {
+  background: #f2f2f2;
+  border-radius: 6px;
+}
+
+/* POST CREATION POP-UP */
+
+.create-post-trigger {
+  cursor: pointer;
+}
+
+.create-post-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.create-post-popup {
+  width: 100%;
+  max-width: 32rem;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 2px 8px 24px rgba(0, 0, 0, 0.18);
+  padding: 24px;
+  animation: popupFadeIn 0.25s ease;
+}
+
+.create-post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 12px;
+}
+
+.create-post-header > h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.close-popup-button {
+  border: none;
+  background: none;
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+  color: rgb(108, 117, 125);
+}
+
+.create-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.create-post-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.create-post-input-group > label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.create-post-input-group > textarea,
+.create-post-input-group > input[type="file"] {
+  border: 1px solid lightgray;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.create-post-input-group > textarea:focus,
+.create-post-input-group > input[type="file"]:focus {
+  border-color: rgb(13, 110, 253);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.create-post-input-group > textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.create-post-button {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  background-color: rgb(13, 110, 253);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.create-post-button:hover {
+  background-color: rgb(11, 94, 215);
+}
+
+.input-error {
+  border: 1px solid rgb(218, 40, 40) !important;
+  background-color: rgba(218, 40, 40, 0.075);
+}
+
+.error-message {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: rgb(218, 40, 40);
+}
+
+.error-message > span {
+  font-size: 12px;
+  color: rgb(218, 40, 40)
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media screen and (max-width: 1150px) {
@@ -219,3 +441,4 @@
   }
 
 }
+

@@ -9,7 +9,7 @@ function Messages () {
 
         <div className="messages-header">
           <h5>Messages</h5>
-          <a href="messages.html">1 unread</a>
+          <a>1 unread</a>
         </div>
 
         <div className="messages-invidual-container">
@@ -39,7 +39,7 @@ function Messages () {
         </div>
 
         <div>
-          <a className="see-more-link" href="messages.html">See all</a>
+          <a className="see-more-link">See all</a>
         </div>
 
       </div>

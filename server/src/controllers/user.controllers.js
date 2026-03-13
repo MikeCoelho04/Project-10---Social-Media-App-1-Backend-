@@ -71,43 +71,98 @@ const fetchSingleUser = async (req, res) => {
 
 }
 
+const getCurrentUser = async (req, res) => {
+
+  try {
+
+    const user = await User.findById(req._id).select('-password -email')
+
+    if (!user) {
+      return res.status(404).json({
+        status: 'FAILED',
+        message: 'User not found'
+      })
+    }
+
+    res.json({
+      status: 'OK',
+      data: user
+    })
+
+  } catch (error) {
+
+    res.status(500).json({
+      status: 'FAILED',
+      message: 'Failed to fetch current user.'
+    })
+
+  }
+
+}
+
 const userSignin = async (req, res) => {
 
   try {
 
-    const { email, username, password, fullName, bio } = req.body
+    const { email, username, password, fullName, bio, repeatedPassword } = req.body
 
     // Checks for uniques values
 
-      // email
+    const backendErrors = {}
 
     const existingEmail = await User.findOne({email})
 
     if(existingEmail) {
-
-      return res.status(409).json({
-        status: 'FAILED',
-        message: 'This email is already in use!',
-        field: 'email',
-      })
-
+      backendErrors.email = 'This email is already in use!'
     }
-
-      // username
 
     const existingUsername = await User.findOne({username})
 
     if(existingUsername) {
-      
-      return res.status(409).json({
-        status: 'FAILED',
-        message: 'This username is already in use!',
-        field: 'username',
-      })
-      
+      backendErrors.username = 'This username is already in use!'
     }
 
+    if (Object.keys(backendErrors).length > 0) {
+      return res.status(409).json({
+        errors: backendErrors
+      })
+    }
+
+    // Check for format values
+
+    if(email.length == 0 || username.length == 0 || fullName.length == 0 || password.length == 0 || repeatedPassword == 0) {
+      return res.status(400).json({
+        status: 'FAILED',
+        message: 'Some fields are required',
+      })
+    }
+
+    if(!email.includes('@')) {
+      return res.status(400).json({
+        status: 'FAILED',
+        message: 'A valid email is required!',
+        field: 'email'
+      })
+    }
+
+    if(!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!-\/]).{8,}/.test(password)) {
+      return res.status(400).json({
+        message: `The password isn't weel formated`,
+      })
+    }
+
+    if(password !== repeatedPassword) {
+      return res.status(400).json({
+        message: `The passwords don't match`
+      })
+    }
+
+
+
+
     // To change to the correct file name (avatarUrl)
+
+    let avatarPath
 
     if(req.file) {
 
@@ -120,6 +175,8 @@ const userSignin = async (req, res) => {
   
       await fs.rename(oldPath, newPath)
 
+      avatarPath = `uploads/profilePics/${newFileName}`
+    
     }
 
 
@@ -131,13 +188,25 @@ const userSignin = async (req, res) => {
       password: encryptedPassword,
       fullName,
       bio,
-      avatarUrl: req.file ? `uploads/profilePics/${newFileName}` : undefined,
+      avatarUrl: avatarPath,
     })
 
+    const user = await User.findOne( { email } ).exec()
+
+    const { _id } = user
+ 
+    const token = jwt.sign({ _id }, process.env.PRIVATE_KEY, { expiresIn: '2 days' })
+
+    res.cookie('token', token, { 
+      httpOnly: true,  
+      maxAge: 24*60*60*1000 
+    })
+    
     res.json({
       status: 'OK',
       message: 'User created!'
     })
+
 
   } catch (error) {
 
@@ -161,30 +230,43 @@ const userLogin = async (req, res) => {
 
     const user = await User.findOne( { email } ).exec()
 
-    if(!user) {
-      res.status(401).json({
+    if(email.length == 0 || password.length == 0 || !email.includes('@')) {
+
+      return res.status(400).json ({
         status: 'FAILED',
-        message: 'Invalid email or password, please try again'
+        message: 'Some fields are required!'
+      })
+
+    }
+
+    if(!user) {
+      return res.status(401).json({
+        status: 'FAILED',
+        message: 'The login information you entered is incorrect.'
       })
     }
 
     const pwd = await bcrypt.compare(password, user.password)
     
     if(!pwd) {
-      res.status(401).json({
+      return res.status(401).json({
         status: 'FAILED',
-        message: 'Invalid email or password, please try again'
+        message: 'The login information you entered is incorrect.'
       })
     }
 
     const { _id } = user
  
-    const token = jwt.sign({ _id }, process.env.PRIVATE_KEY, { expiresIn: '7 days' })
+    const token = jwt.sign({ _id }, process.env.PRIVATE_KEY, { expiresIn: '2 days' })
     
+    res.cookie('token', token, { 
+      httpOnly: true,  
+      maxAge: 24*60*60*1000 
+    })
+
     res.json({
       status: 'OK',
       message: 'User login successfully',
-      token,
     })
 
 
@@ -202,12 +284,14 @@ const userLogin = async (req, res) => {
 }
 
 const userLogout = async (req, res) => {
-
-  const userId = req._id
-
-  const user = await User.findById(userId)
-
+  
   try {
+
+    const userId = req._id
+  
+    const user = await User.findById(userId)
+
+    res.clearCookie('token')
 
     res.json({
       status: 'OK',
@@ -231,6 +315,7 @@ const updateUser = async (req, res) => {
 
     const { id } = req.params
     const { username, fullName, bio } = req.body
+    const updates = { username, fullName, bio }
 
     if(req.file) {
 
@@ -242,20 +327,17 @@ const updateUser = async (req, res) => {
       const newPath = path.join(path.dirname(oldPath), newFileName)
 
       await fs.rename(oldPath, newPath)
-
-      const user = await User.findByIdAndUpdate(id)
-
-      user.avatarUrl = `/uploads/profilePics/${newFileName}`
-
-      await user.save()
+      updates.avatarUrl = `/uploads/profilePics/${newFileName}`
 
     }
 
-    await User.findByIdAndUpdate(id, { username, fullName, bio })
+    const user = await User.findByIdAndUpdate(id, updates, { new: true })
+      .select('-password')
 
     res.json({
       status: 'OK',
-      message: 'User updated successfully'
+      message: 'User updated successfully',
+      data: user,
     })
 
   } catch(error) {
@@ -409,6 +491,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
   fetchUsers,
   fetchSingleUser,
+  getCurrentUser,
   userSignin,
   userLogin,
   userLogout,

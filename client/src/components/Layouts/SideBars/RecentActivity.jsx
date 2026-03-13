@@ -13,7 +13,7 @@ function RecentActivity () {
         </div>
 
         <div className="recent-activity-card">
-          <img className="profile-pic" src={profilePic} alt="" />
+          <div className="profile-pic-wrapper"><img className="profile-pic" src={profilePic} alt="" /></div>
           <div>
             <span className='profile-name'>You liked this post</span>
             <span className='profile-tag'>10 min ago</span>
@@ -21,7 +21,7 @@ function RecentActivity () {
         </div>
 
         <div className="recent-activity-card">
-          <img className="profile-pic" src={profilePic} alt="" />
+          <div className="profile-pic-wrapper"><img className="profile-pic" src={profilePic} alt="" /></div>
           <div>
             <span className='profile-name'>You liked this post</span>
             <span className='profile-tag'>10 min ago</span>
@@ -29,7 +29,7 @@ function RecentActivity () {
         </div>
 
         <div className="recent-activity-card">
-          <img className="profile-pic" src={profilePic} alt="" />
+          <div className="profile-pic-wrapper"><img className="profile-pic" src={profilePic} alt="" /></div>
           <div>
             <span className='profile-name'>You liked this post</span>
             <span className='profile-tag'>10 min ago</span>

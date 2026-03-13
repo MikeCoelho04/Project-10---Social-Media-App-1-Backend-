@@ -11,6 +11,7 @@ const {
 const {
   fetchUsers,
   fetchSingleUser,
+  getCurrentUser,
   userSignin,
   userLogin,
   userLogout,
@@ -18,7 +19,16 @@ const {
   deleteUser,
 } = require('../controllers/user.controllers')
 
+router.get('/auth/check', isUserLoggedIn, (req, res) => {
+  res.json({
+    authenticated: true,
+    userId: req._id
+  })
+})
+
 router.get('/users', isUserLoggedIn, fetchUsers)
+
+router.get('/users/me', isUserLoggedIn, getCurrentUser)
 
 router.get('/users/:id', isUserLoggedIn, fetchSingleUser)
 
